@@ -18,6 +18,7 @@ from pyhon.connection.handler.hon import HonConnectionHandler
 _LOGGER = logging.getLogger(__name__)
 
 
+# pylint: disable=too-many-instance-attributes
 class HonAPI:
     def __init__(
         self,
@@ -77,6 +78,7 @@ class HonAPI:
                 self._password,
                 session=self._session,
                 mobile_id=self._mobile_id,
+                refresh_token=self._refresh_token,
             ).create()
         return self
 
@@ -190,6 +192,13 @@ class HonAPI:
         async with self._hon.get(url, params=params) as response:
             maintenance: Dict[str, Any] = (await response.json()).get("payload", {})
         return maintenance
+
+    async def load_aws_token(self) -> str:
+        url: str = f"{const.API_URL}/auth/v1/introspection"
+        async with self._hon.get(url) as response:
+            introspection: Dict[str, Any] = (await response.json()).get("payload", {})
+        result: str = introspection.get("tokenSigned", "")
+        return result
 
     async def send_command(
         self,
