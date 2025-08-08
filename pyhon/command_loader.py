@@ -195,11 +195,12 @@ class HonCommandLoader:
     def _get_favourite_info(
         self, favourite: Dict[str, Any]
     ) -> tuple[str, str, HonCommand | None]:
-        name: str = favourite.get("favouriteName", {})
+        name: str = favourite.get("favouriteName", "")
         command = favourite.get("command", {})
         command_name: str = command.get("commandName", "")
         program_name = self._clean_name(command.get("programName", ""))
-        base_command = self.commands[command_name].categories.get(program_name)
+        base = self.commands.get(command_name)
+        base_command = base.categories.get(program_name) if base else None
         return name, command_name, base_command
 
     def _update_base_command_with_data(
